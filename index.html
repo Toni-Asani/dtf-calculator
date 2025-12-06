@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calcul flocage textiles DTF – Printedesign</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #222;
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      color: #fff;
+    }
+    .app-container {
+      background: #0f2745;
+      border-radius: 8px;
+      padding: 16px 14px 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+      max-width: 480px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+    .section {
+      background: #e0e0e0;
+      color: #000;
+      border-radius: 6px;
+      padding: 10px 10px;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #444;
+      font-size: 13px;
+    }
+    .row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .field label {
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+    .field input,
+    .field select {
+      padding: 6px 7px;
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .field input[type="number"] {
+      text-align: right;
+    }
+    .side-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #333;
+    }
+    .side-header label {
+      font-weight: normal;
+      font-size: 12px;
+    }
+    .results {
+      margin-top: 10px;
+      background: #f3f3f3;
+      color: #000;
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .results h2 {
+      margin-top: 0;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+    .results-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+    .results-line span.value {
+      font-weight: bold;
+    }
+    .total-box {
+      margin-top: 8px;
+      background: #5b2c83;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .total-box span.value {
+      font-size: 16px;
+      font-weight: bold;
+      background: #c6e48b;
+      color: #000;
+      padding: 3px 6px;
+      border-radius: 4px;
+      min-width: 80px;
+      text-align: right;
+    }
+    .note {
+      margin-top: 6px;
+      font-size: 10px;
+      color: #555;
+      text-align: right;
+    }
+    button {
+      margin-top: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .footer {
+      margin-top: 8px;
+      font-size: 10px;
+      color: #ccc;
+      text-align: center;
+      line-height: 1.4;
+    }
+    @media (min-width: 720px) {
+      .app-container {
+        max-width: 700px;
+      }
+      .row {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+      }
+      .field {
+        width: 48%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h1>CALCUL FLOCAGE TEXTILES DTF – 4 CÔTÉS</h1>
+
+    <!-- Paramètres généraux -->
+    <div class="section">
+      <div class="section-title">Paramètres généraux</div>
+      <div class="row">
+        <div class="field">
+          <label for="garmentType">Type de vêtement</label>
+          <select id="garmentType">
+            <option value="tshirt">T-shirt</option>
+            <option value="polo">Polo</option>
+            <option value="pull">Pull</option>
+            <option value="polaire">Jaquette polaire</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Prix vêtement (CHF)</label>
+          <input id="garmentPrice" type="number" step="0.01" value="0.00" readonly />
+        </div>
+
+        <div class="field">
+          <label for="quantity">Nombre de vêtements</label>
+          <input id="quantity" type="number" min="1" value="1" />
+        </div>
+
+        <div class="field">
+          <label for="pricePerCm2">Prix DTF par cm² (CHF)</label>
+          <input id="pricePerCm2" type="number" step="0.0001" value="0.025" />
+        </div>
+      </div>
+    </div>
+
+    <!-- FACE -->
+    <div class="section">
+      <div class="side-header">
+        <span>FACE</span>
+        <label>
+          <input type="checkbox" id="faceActive" checked />
+          Activer ce côté
+        </label>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="faceWidth">Largeur FACE (cm)</label>
+          <input id="faceWidth" type="number" min="0" step="0.1" value="12" />
+        </div>
+        <div class="field">
+          <label for="faceHeight">Hauteur FACE (cm)</label>
+          <input id="faceHeight" type="number" min="0" step="0.1" value="5" />
+        </div>
+        <div class="field">
+          <label>Surface FACE (cm²)</label>
+          <input id="faceArea" type="number" value="0.0" readonly />
+        </div>
+        <div class="field">
+          <label>Coût DTF FACE (CHF)</label>
+          <input id="faceCost" type="number" value="0.00" readonly />
+        </div>
+      </div>
+    </div>
+
+    <!-- DOS -->
+    <div class="section">
+      <div class="side-header">
+        <span>DOS</span>
+        <label>
+          <input type="checkbox" id="backActive" />
+          Activer ce côté
+        </label>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="backWidth">Largeur DOS (cm)</label>
+          <input id="backWidth" type="number" min="0" step="0.1" value="25" />
+        </div>
+        <div class="field">
+          <label for="backHeight">Hauteur DOS (cm)</label>
+          <input id="backHeight" type="number" min="0" step="0.1" value="15" />
+        </div>
+        <div class="field">
+          <label>Surface DOS (cm²)</label>
+          <input id="backArea" type="number" value="0.0" readonly />
+        </div>
+        <div class="field">
+          <label>Coût DTF DOS (CHF)</label>
+          <input id="backCost" type="number" value="0.00" readonly />
+        </div>
+      </div>
+    </div>
+
+    <!-- ÉPAULE DROITE -->
+    <div class="section">
+      <div class="side-header">
+        <span>ÉPAULE DROITE</span>
+        <label>
+          <input type="checkbox" id="rightActive" />
+          Activer ce côté
+        </label>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="rightWidth">Largeur ÉPAULE DROITE (cm)</label>
+          <input id="rightWidth" type="number" min="0" step="0.1" value="8" />
+        </div>
+        <div class="field">
+          <label for="rightHeight">Hauteur ÉPAULE DROITE (cm)</label>
+          <input id="rightHeight" type="number" min="0" step="0.1" value="3" />
+        </div>
+        <div class="field">
+          <label>Surface ÉPAULE DROITE (cm²)</label>
+          <input id="rightArea" type="number" value="0.0" readonly />
+        </div>
+        <div class="field">
+          <label>Coût DTF ÉPAULE DROITE (CHF)</label>
+          <input id="rightCost" type="number" value="0.00" readonly />
+        </div>
+      </div>
+    </div>
+
+    <!-- ÉPAULE GAUCHE -->
+    <div class="section">
+      <div class="side-header">
+        <span>ÉPAULE GAUCHE</span>
+        <label>
+          <input type="checkbox" id="leftActive" />
+          Activer ce côté
+        </label>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="leftWidth">Largeur ÉPAULE GAUCHE (cm)</label>
+          <input id="leftWidth" type="number" min="0" step="0.1" value="8" />
+        </div>
+        <div class="field">
+          <label for="leftHeight">Hauteur ÉPAULE GAUCHE (cm)</label>
+          <input id="leftHeight" type="number" min="0" step="0.1" value="3" />
+        </div>
+        <div class="field">
+          <label>Surface ÉPAULE GAUCHE (cm²)</label>
+          <input id="leftArea" type="number" value="0.0" readonly />
+        </div>
+        <div class="field">
+          <label>Coût DTF ÉPAULE GAUCHE (CHF)</label>
+          <input id="leftCost" type="number" value="0.00" readonly />
+        </div>
+      </div>
+    </div>
+
+    <!-- Résultats -->
+    <div class="results">
+      <h2>Résultats</h2>
+
+      <div class="results-line">
+        <span>Nombre de côtés actifs</span>
+        <span class="value" id="activeSides">0</span>
+      </div>
+
+      <div class="results-line">
+        <span>Coût temps total (CHF / pièce)</span>
+        <span class="value" id="timeCostDisplay">0.00</span>
+      </div>
+
+      <div class="results-line">
+        <span>Coût DTF total (CHF / pièce)</span>
+        <span class="value" id="dtfTotalDisplay">0.00</span>
+      </div>
+
+      <div class="results-line">
+        <span>Prix de base par vêtement (sans remise)</span>
+        <span class="value" id="pricePerPieceBase">0.00</span>
+      </div>
+
+      <div class="results-line">
+        <span>Remise quantité</span>
+        <span class="value" id="discountRate">0 %</span>
+      </div>
+
+      <div class="results-line">
+        <span>Prix par vêtement (avec remise)</span>
+        <span class="value" id="pricePerPiece">0.00</span>
+      </div>
+
+      <div class="results-line">
+        <span>Total commande (CHF)</span>
+        <span class="value" id="priceTotalOrder">0.00</span>
+      </div>
+
+      <div class="total-box">
+        <span>Prix total (CHF)</span>
+        <span class="value" id="grandTotal">0.00</span>
+      </div>
+
+      <button id="resetBtn">Réinitialiser</button>
+      <div class="note">
+        Remise dégressive appliquée automatiquement selon la quantité.
+      </div>
+    </div>
+
+    <div class="footer">
+      Programme de calcul développé par Printedesign<br />
+      Outil interne destiné à optimiser les offres de marquage textile DTF.
+    </div>
+  </div>
+
+  <script>
+    const garmentPrices = {
+      tshirt: 8,
+      polo: 12,
+      pull: 14,
+      polaire: 16
+    };
+
+    const garmentTypeEl = document.getElementById('garmentType');
+    const garmentPriceEl = document.getElementById('garmentPrice');
+    const quantityEl = document.getElementById('quantity');
+    const pricePerCm2El = document.getElementById('pricePerCm2');
+
+    // Côtés
+    const faceActiveEl = document.getElementById('faceActive');
+    const faceWidthEl = document.getElementById('faceWidth');
+    const faceHeightEl = document.getElementById('faceHeight');
+    const faceAreaEl = document.getElementById('faceArea');
+    const faceCostEl = document.getElementById('faceCost');
+
+    const backActiveEl = document.getElementById('backActive');
+    const backWidthEl = document.getElementById('backWidth');
+    const backHeightEl = document.getElementById('backHeight');
+    const backAreaEl = document.getElementById('backArea');
+    const backCostEl = document.getElementById('backCost');
+
+    const rightActiveEl = document.getElementById('rightActive');
+    const rightWidthEl = document.getElementById('rightWidth');
+    const rightHeightEl = document.getElementById('rightHeight');
+    const rightAreaEl = document.getElementById('rightArea');
+    const rightCostEl = document.getElementById('rightCost');
+
+    const leftActiveEl = document.getElementById('leftActive');
+    const leftWidthEl = document.getElementById('leftWidth');
+    const leftHeightEl = document.getElementById('leftHeight');
+    const leftAreaEl = document.getElementById('leftArea');
+    const leftCostEl = document.getElementById('leftCost');
+
+    // Résultats
+    const activeSidesEl = document.getElementById('activeSides');
+    const timeCostDisplayEl = document.getElementById('timeCostDisplay');
+    const dtfTotalDisplayEl = document.getElementById('dtfTotalDisplay');
+    const pricePerPieceBaseEl = document.getElementById('pricePerPieceBase');
+    const discountRateEl = document.getElementById('discountRate');
+    const pricePerPieceEl = document.getElementById('pricePerPiece');
+    const priceTotalOrderEl = document.getElementById('priceTotalOrder');
+    const grandTotalEl = document.getElementById('grandTotal');
+
+    const resetBtn = document.getElementById('resetBtn');
+
+    function parseNumber(el) {
+      const v = parseFloat(el.value);
+      return isNaN(v) ? 0 : v;
+    }
+
+    function calcSide(active, wEl, hEl, areaEl, costEl, pricePerCm2) {
+      const w = parseNumber(wEl);
+      const h = parseNumber(hEl);
+      const area = active ? (w * h) : 0;
+      const cost = area * pricePerCm2;
+      areaEl.value = area.toFixed(1);
+      costEl.value = cost.toFixed(2);
+      return { area, cost };
+    }
+
+    function updateCalculations() {
+      const garmentType = garmentTypeEl.value;
+      const garmentPrice = garmentPrices[garmentType] || 0;
+      garmentPriceEl.value = garmentPrice.toFixed(2);
+
+      const qtyRaw = parseInt(quantityEl.value, 10);
+      const qty = (!isNaN(qtyRaw) && qtyRaw > 0) ? qtyRaw : 1;
+      quantityEl.value = qty;
+
+      const pricePerCm2 = parseNumber(pricePerCm2El);
+
+      const faceActive = faceActiveEl.checked;
+      const backActive = backActiveEl.checked;
+      const rightActive = rightActiveEl.checked;
+      const leftActive = leftActiveEl.checked;
+
+      const face = calcSide(faceActive, faceWidthEl, faceHeightEl, faceAreaEl, faceCostEl, pricePerCm2);
+      const back = calcSide(backActive, backWidthEl, backHeightEl, backAreaEl, backCostEl, pricePerCm2);
+      const right = calcSide(rightActive, rightWidthEl, rightHeightEl, rightAreaEl, rightCostEl, pricePerCm2);
+      const left = calcSide(leftActive, leftWidthEl, leftHeightEl, leftAreaEl, leftCostEl, pricePerCm2);
+
+      const activeSidesCount =
+        (faceActive ? 1 : 0) +
+        (backActive ? 1 : 0) +
+        (rightActive ? 1 : 0) +
+        (leftActive ? 1 : 0);
+      activeSidesEl.textContent = activeSidesCount.toString();
+
+      const timeCost = activeSidesCount * 5;
+      timeCostDisplayEl.textContent = timeCost.toFixed(2);
+
+      const dtfTotal =
+        face.cost + back.cost + right.cost + left.cost;
+      dtfTotalDisplayEl.textContent = dtfTotal.toFixed(2);
+
+      const basePricePerPiece = garmentPrice + dtfTotal + timeCost;
+      pricePerPieceBaseEl.textContent = basePricePerPiece.toFixed(2);
+
+      let discountRate = 0;
+      if (qty >= 50) {
+        discountRate = 0.15;
+      } else if (qty >= 20) {
+        discountRate = 0.10;
+      } else if (qty >= 10) {
+        discountRate = 0.05;
+      }
+      discountRateEl.textContent = (discountRate * 100).toFixed(0) + " %";
+
+      const pricePerPiece = basePricePerPiece * (1 - discountRate);
+      pricePerPieceEl.textContent = pricePerPiece.toFixed(2);
+
+      const totalOrder = pricePerPiece * qty;
+      priceTotalOrderEl.textContent = totalOrder.toFixed(2);
+      grandTotalEl.textContent = totalOrder.toFixed(2);
+    }
+
+    function resetForm() {
+      garmentTypeEl.value = 'tshirt';
+      quantityEl.value = 1;
+      pricePerCm2El.value = 0.025;
+
+      faceActiveEl.checked = true;
+      faceWidthEl.value = 12;
+      faceHeightEl.value = 5;
+
+      backActiveEl.checked = false;
+      backWidthEl.value = 25;
+      backHeightEl.value = 15;
+
+      rightActiveEl.checked = false;
+      rightWidthEl.value = 8;
+      rightHeightEl.value = 3;
+
+      leftActiveEl.checked = false;
+      leftWidthEl.value = 8;
+      leftHeightEl.value = 3;
+
+      updateCalculations();
+    }
+
+    const inputsToWatch = [
+      garmentTypeEl, quantityEl, pricePerCm2El,
+      faceActiveEl, faceWidthEl, faceHeightEl,
+      backActiveEl, backWidthEl, backHeightEl,
+      rightActiveEl, rightWidthEl, rightHeightEl,
+      leftActiveEl, leftWidthEl, leftHeightEl
+    ];
+
+    inputsToWatch.forEach(el => {
+      el.addEventListener('input', updateCalculations);
+      el.addEventListener('change', updateCalculations);
+    });
+
+    resetBtn.addEventListener('click', resetForm);
+
+    window.onload = resetForm;
+  </script>
+</body>
+</html>
