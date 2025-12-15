@@ -2,21 +2,77 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>CALCUL DTF TEXTILES ET UV – Printedesign</title>
+<title>Calcul DTF Textiles & UV – Printedesign</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body{font-family:Arial;background:#111;color:#fff;margin:0;padding:10px}
-.container{max-width:900px;margin:auto;background:#1f1f1f;padding:15px;border-radius:8px}
-h1{text-align:center;font-size:18px}
-.section{background:#eee;color:#000;padding:10px;border-radius:6px;margin-bottom:10px}
-label{font-size:13px}
-input,select{width:100%;padding:6px;margin-bottom:6px}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.col{flex:1;min-width:150px}
-.result{background:#222;color:#fff;padding:10px;border-radius:6px}
-.total{font-size:18px;font-weight:bold;color:#b6ff8a}
-.footer{text-align:center;font-size:11px;color:#aaa;margin-top:10px}
-.radio{display:flex;gap:15px}
+body{
+  margin:0;
+  padding:10px;
+  font-family:Arial, sans-serif;
+  background:#1e1e1e;
+  color:#fff;
+}
+.container{
+  max-width:520px;
+  margin:auto;
+  background:#0f2745;
+  padding:15px;
+  border-radius:8px;
+}
+h1{
+  text-align:center;
+  font-size:18px;
+  margin-bottom:15px;
+}
+.section{
+  background:#f2f2f2;
+  color:#000;
+  padding:10px;
+  border-radius:6px;
+  margin-bottom:10px;
+}
+label{
+  font-size:12px;
+  margin-bottom:3px;
+}
+input,select{
+  width:100%;
+  padding:6px;
+  margin-bottom:6px;
+  font-size:13px;
+}
+.side{
+  border-top:1px solid #ccc;
+  padding-top:6px;
+  margin-top:6px;
+}
+.results{
+  background:#eaeaea;
+  padding:10px;
+  border-radius:6px;
+}
+.line{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  margin-bottom:4px;
+}
+.total{
+  background:#5b2c83;
+  color:#fff;
+  padding:8px;
+  border-radius:6px;
+  font-size:15px;
+  display:flex;
+  justify-content:space-between;
+}
+.footer{
+  margin-top:8px;
+  font-size:10px;
+  color:#ccc;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -27,93 +83,136 @@ input,select{width:100%;padding:6px;margin-bottom:6px}
 <div class="section">
 <label>Type de marquage</label>
 <select id="mode">
-<option value="textile">DTF TEXTILE</option>
-<option value="uv">DTF UV</option>
+  <option value="textile">DTF Textile</option>
+  <option value="uv">DTF UV</option>
 </select>
 
-<label>Type de vêtement</label>
+<label>Type de produit</label>
 <select id="garment">
-<option value="0">Flocage seul</option>
-<option value="6">T-shirt</option>
-<option value="8">T-shirt Premium</option>
-<option value="12">Polo</option>
-<option value="14">Pull</option>
-<option value="16">Jaquette polaire</option>
-<option value="16">Jaquette capuche zip</option>
+  <option value="tshirt6">T-shirt (6.–)</option>
+  <option value="tshirt8">T-shirt Premium (8.–)</option>
+  <option value="polo">Polo (12.–)</option>
+  <option value="pull">Pull (14.–)</option>
+  <option value="jacket">Jaquette capuche zip (16.–)</option>
+  <option value="flocseul">Flocage seul</option>
 </select>
 
 <label>Quantité</label>
 <input type="number" id="qty" value="1" min="1">
-
-<label>Pose</label>
-<div class="radio">
-<label><input type="radio" name="pose" value="on" checked> Avec pose</label>
-<label><input type="radio" name="pose" value="off"> Sans pose</label>
-</div>
 </div>
 
-<div class="section">
-<h3>Surfaces (cm)</h3>
-<div class="row">
-<div class="col"><label>Face (L×H)</label><input id="fL" value="12"><input id="fH" value="5"></div>
-<div class="col"><label>Dos (L×H)</label><input id="dL" value="0"><input id="dH" value="0"></div>
-<div class="col"><label>Épaule G (L×H)</label><input id="gL" value="0"><input id="gH" value="0"></div>
-<div class="col"><label>Épaule D (L×H)</label><input id="rL" value="0"><input id="rH" value="0"></div>
+<!-- CÔTÉS TEXTILE -->
+<div class="section" id="textileSides">
+<div class="side">
+<strong>FACE</strong>
+<input type="checkbox" id="facePose" checked> Pose (+5.–)
+<input type="number" id="faceW" placeholder="Largeur cm">
+<input type="number" id="faceH" placeholder="Hauteur cm">
+</div>
+
+<div class="side">
+<strong>DOS</strong>
+<input type="checkbox" id="backPose"> Pose (+5.–)
+<input type="number" id="backW" placeholder="Largeur cm">
+<input type="number" id="backH" placeholder="Hauteur cm">
+</div>
+
+<div class="side">
+<strong>ÉPAULE DROITE</strong>
+<input type="checkbox" id="rightPose"> Pose (+5.–)
+<input type="number" id="rightW" placeholder="Largeur cm">
+<input type="number" id="rightH" placeholder="Hauteur cm">
+</div>
+
+<div class="side">
+<strong>ÉPAULE GAUCHE</strong>
+<input type="checkbox" id="leftPose"> Pose (+5.–)
+<input type="number" id="leftW" placeholder="Largeur cm">
+<input type="number" id="leftH" placeholder="Hauteur cm">
 </div>
 </div>
 
-<div class="result">
-<div>Prix unitaire : <span id="unit">0.00</span> CHF</div>
-<div>Total commande : <span class="total" id="total">0.00</span> CHF</div>
+<!-- DTF UV -->
+<div class="section" id="uvSection" style="display:none">
+<label>Largeur (cm)</label>
+<input type="number" id="uvW">
+<label>Hauteur (cm)</label>
+<input type="number" id="uvH">
+</div>
+
+<div class="results">
+<div class="line"><span>Prix unitaire</span><span id="unit">0.00</span></div>
+<div class="line"><span>Total commande</span><span id="total">0.00</span></div>
+<div class="total"><span>TOTAL CHF</span><span id="grand">0.00</span></div>
 </div>
 
 <div class="footer">
-Programme de calcul développé par Printedesign<br>
-Outil interne d’estimation – tarifs indicatifs
+Outil de calcul développé par Printedesign – usage commercial
 </div>
 </div>
 
 <script>
-function remise(q){
-if(q>=101)return 0.30;
-if(q>=81)return 0.25;
-if(q>=51)return 0.20;
-if(q>=41)return 0.15;
-if(q>=31)return 0.10;
-if(q>=21)return 0.08;
-if(q>=11)return 0.05;
-return 0;
-}
+const garmentPrices={
+  tshirt6:6,
+  tshirt8:8,
+  polo:12,
+  pull:14,
+  jacket:16,
+  flocseul:0
+};
+
+const DTF_TEXTILE_CM2=0.025;
+const DTF_UV_CM2_CLIENT=0.05;
 
 function calc(){
-let mode=document.getElementById("mode").value;
-let garment=parseFloat(document.getElementById("garment").value);
-let q=parseInt(document.getElementById("qty").value)||1;
+  const mode=document.getElementById("mode").value;
+  const qty=parseInt(document.getElementById("qty").value)||1;
+  let base=garmentPrices[document.getElementById("garment").value]||0;
+  let dtf=0,pose=0;
 
-let areas=[
-fL.value*fH.value,
-dL.value*dH.value,
-gL.value*gH.value,
-rL.value*rH.value
-];
+  if(mode==="textile"){
+    const sides=[
+      ["face","facePose"],
+      ["back","backPose"],
+      ["right","rightPose"],
+      ["left","leftPose"]
+    ];
+    sides.forEach(s=>{
+      let w=parseFloat(document.getElementById(s[0]+"W").value)||0;
+      let h=parseFloat(document.getElementById(s[0]+"H").value)||0;
+      if(w>0&&h>0) dtf+=w*h*DTF_TEXTILE_CM2;
+      if(document.getElementById(s[1]).checked && w>0 && h>0) pose+=5;
+    });
+  } else {
+    let w=parseFloat(document.getElementById("uvW").value)||0;
+    let h=parseFloat(document.getElementById("uvH").value)||0;
+    dtf=w*h*DTF_UV_CM2_CLIENT;
+  }
 
-let activeSides=areas.filter(a=>a>0).length;
-let surface=areas.reduce((a,b)=>a+b,0);
+  let unit=base+dtf+pose;
+  let total=unit*qty;
 
-let priceCm2= mode==="textile"?0.025:0.05;
-let impression=surface*priceCm2;
-
-let pose=document.querySelector('input[name="pose"]:checked').value==="on"
-? activeSides*5 : 0;
-
-let unit=garment+impression+pose;
-unit=unit*(1-remise(q));
-
-document.getElementById("unit").innerText=unit.toFixed(2);
-document.getElementById("total").innerText=(unit*q).toFixed(2);
+  document.getElementById("unit").innerText=unit.toFixed(2);
+  document.getElementById("total").innerText=total.toFixed(2);
+  document.getElementById("grand").innerText=total.toFixed(2);
 }
 
-document.querySelectorAll("input,select").forEach(e=>e.addEventListener("input",calc));
+document.querySelectorAll("input,select").forEach(e=>{
+  e.addEventListener("input",calc);
+  e.addEventListener("change",calc);
+});
+
+document.getElementById("mode").addEventListener("change",()=>{
+  const uv=document.getElementById("uvSection");
+  const tx=document.getElementById("textileSides");
+  if(document.getElementById("mode").value==="uv"){
+    uv.style.display="block"; tx.style.display="none";
+  } else {
+    uv.style.display="none"; tx.style.display="block";
+  }
+  calc();
+});
+
 calc();
 </script>
 </body>
