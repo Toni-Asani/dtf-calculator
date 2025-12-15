@@ -31,7 +31,11 @@
     th{text-align:left;color:#444}
     td input{width:100%}
     .chip{display:inline-block;background:#fff;border-radius:999px;padding:2px 8px;font-size:11px;color:#333}
-    .hidden{display:none!important}
+    .sub-section{margin-top:8px;padding:8px;background:#f5f5f5;border-radius:4px;border-left:3px solid #5b2c83}
+    .object-line{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    .object-line .field{flex:1}
+    .object-line .field:first-child{flex:2}
+    .checkbox-line{display:flex;align-items:center;gap:6px;margin-bottom:8px}
   </style>
 </head>
 <body>
@@ -46,7 +50,7 @@
         <select id="mode">
           <option value="textile" selected>DTF TEXTILE (vêtements)</option>
           <option value="print_seul">DTF PRINT SEUL (impression seulement)</option>
-          <option value="uv">DTF UV (stickers / objets) – impression seule</option>
+          <option value="uv">DTF UV (stickers / objets)</option>
         </select>
       </div>
     </div>
@@ -175,22 +179,53 @@
     <div class="section">
       <div class="section-title">Paramètres DTF UV (stickers / objets)</div>
       <div class="row">
+        <div class="checkbox-line">
+          <input type="checkbox" id="uvWithObject" />
+          <label for="uvWithObject">Avec objet fourni par Printedesign</label>
+        </div>
+        
         <div class="field">
-          <label for="uvClientCm2">Prix client / cm² (CHF)</label>
+          <label for="uvClientCm2">Prix impression / cm² (CHF)</label>
           <input id="uvClientCm2" type="number" step="0.0001" value="0.05" />
         </div>
+        
         <div class="field">
           <label for="uvSetupFee">Frais de setup (CHF) – une fois par commande</label>
           <input id="uvSetupFee" type="number" step="0.01" value="5" />
         </div>
+        
         <div class="field muted">
-          Minimum facturé: 1 planche B4 (24.5×35 cm = 857.5 cm²)
+          Minimum facturé: 1 planche B4 (24.5×35 cm = 857.5 cm²) pour l'impression
+        </div>
+      </div>
+    </div>
+
+    <!-- Section objet -->
+    <div class="section" id="uvObjectSection">
+      <div class="section-title">Objet fourni par Printedesign</div>
+      <div class="row">
+        <div class="object-line">
+          <div class="field">
+            <label for="uvObjectName">Libellé de l'objet</label>
+            <input id="uvObjectName" type="text" placeholder="Ex: Coque iPhone, Carte magnétique..." value="" />
+          </div>
+          <div class="field">
+            <label for="uvObjectPrice">Prix unitaire (CHF)</label>
+            <input id="uvObjectPrice" type="number" step="0.01" value="0.00" />
+          </div>
+          <div class="field">
+            <label for="uvObjectQuantity">Quantité</label>
+            <input id="uvObjectQuantity" type="number" min="1" value="1" />
+          </div>
+        </div>
+        <div class="muted">
+          L'objet est fourni et préparé par Printedesign pour l'impression UV
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title">Formes (plusieurs tailles)</div>
+      <div class="section-title">Formes à imprimer (plusieurs tailles)</div>
       <div class="muted">Entre largeur/hauteur + quantité. Le calcul additionne les surfaces.</div>
       <table>
         <thead>
@@ -213,9 +248,10 @@
     <div class="results-line"><span>Remise quantité</span><span class="value" id="discountRate">0 %</span></div>
 
     <div class="results-line"><span>Prix / unité (CHF)</span><span class="value" id="pricePerPiece">0.00</span></div>
-    <div class="results-line"><span>Total commande (CHF)</span><span class="value" id="totalOrder">0.00</span></div>
+    <div class="results-line"><span>Total impression (CHF)</span><span class="value" id="totalPrint">0.00</span></div>
+    <div class="results-line" id="objectCostLine" style="display:none;"><span>Total objet (CHF)</span><span class="value" id="totalObject">0.00</span></div>
 
-    <div class="total-box"><span>Total (CHF)</span><span class="value" id="grandTotal">0.00</span></div>
+    <div class="total-box"><span>Total commande (CHF)</span><span class="value" id="grandTotal">0.00</span></div>
 
     <button id="resetBtn">Réinitialiser</button>
     <div class="note">Créé pour l'usage interne – Printedesign.</div>
@@ -293,6 +329,10 @@
     n('textileBlock').style.display = mode === 'textile' ? '' : 'none';
     n('printSeulBlock').style.display = mode === 'print_seul' ? '' : 'none';
     n('uvBlock').style.display = mode === 'uv' ? '' : 'none';
+    
+    // Gérer la visibilité de la section objet UV
+    const uvWithObject = n('uvWithObject').checked;
+    n('uvObjectSection').style.display = uvWithObject ? '' : 'none';
   }
 
   function update(){
@@ -303,6 +343,8 @@
     let baseUnit = 0;
     let setupFee = 0;
     let subtotal = 0;
+    let objectCost = 0;
+    let objectQuantity = 1;
 
     if(mode === 'textile'){
       const garmentType = n('garmentType').value;
@@ -343,18 +385,37 @@
     if(mode === 'uv'){
       const pricePerCm2 = num(n('uvClientCm2'));
       setupFee = num(n('uvSetupFee'));
+      const withObject = n('uvWithObject').checked;
       
       const {totalArea, totalQty} = calcAreas('u', 4);
       
+      // Pour UV, la quantité pour la remise = quantité totale d'impressions
       qty = Math.max(1, totalQty || 1);
       
       // Minimum: 1 planche B4 (857.5 cm²)
       const MIN_AREA = 857.5;
       const billedArea = Math.max(totalArea, MIN_AREA);
       
-      const totalCost = (billedArea * pricePerCm2) + setupFee;
-      baseUnit = totalCost / qty;
-      subtotal = totalCost;
+      const printCost = (billedArea * pricePerCm2) + setupFee;
+      
+      // Calcul du coût objet si applicable
+      if(withObject){
+        objectCost = num(n('uvObjectPrice'));
+        objectQuantity = Math.max(1, intv(n('uvObjectQuantity')) || 1);
+        const totalObjectCost = objectCost * objectQuantity;
+        
+        // Pour UV avec objet, le prix unitaire inclut l'objet
+        baseUnit = (printCost + totalObjectCost) / Math.max(qty, objectQuantity);
+        subtotal = printCost + totalObjectCost;
+        
+        // Afficher la ligne objet
+        n('objectCostLine').style.display = '';
+        n('totalObject').textContent = totalObjectCost.toFixed(2);
+      } else {
+        baseUnit = printCost / qty;
+        subtotal = printCost;
+        n('objectCostLine').style.display = 'none';
+      }
     }
 
     const disc = discountRateFor(qty);
@@ -364,7 +425,9 @@
     const total = subtotal - discountAmount;
 
     n('pricePerPiece').textContent = baseUnit.toFixed(2);
-    n('totalOrder').textContent = (subtotal - discountAmount).toFixed(2);
+    n('totalPrint').textContent = (mode === 'uv' && n('uvWithObject').checked) ? 
+      (subtotal - (objectCost * objectQuantity)).toFixed(2) : 
+      (subtotal - discountAmount).toFixed(2);
     n('grandTotal').textContent = total.toFixed(2);
   }
 
@@ -388,6 +451,10 @@
     for(let i=2;i<=4;i++){ n(`p${i}w`).value=0; n(`p${i}h`).value=0; n(`p${i}q`).value=0; }
 
     // Reset UV
+    n('uvWithObject').checked = false;
+    n('uvObjectName').value = '';
+    n('uvObjectPrice').value = 0.00;
+    n('uvObjectQuantity').value = 1;
     n('uvClientCm2').value = 0.05;
     n('uvSetupFee').value = 5;
     n('u1w').value = 10; n('u1h').value = 5; n('u1q').value = 5;
@@ -403,6 +470,7 @@
     'rightActive','rightW','rightH','leftActive','leftW','leftH',
     'printSeulPricePerCm2','printSeulSetupFee',
     'p1w','p1h','p1q','p2w','p2h','p2q','p3w','p3h','p3q','p4w','p4h','p4q',
+    'uvWithObject','uvObjectName','uvObjectPrice','uvObjectQuantity',
     'uvClientCm2','uvSetupFee',
     'u1w','u1h','u1q','u2w','u2h','u2q','u3w','u3h','u3q','u4w','u4h','u4q'
   ];
