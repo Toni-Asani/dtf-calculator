@@ -152,68 +152,132 @@ Outil de calcul développé par Printedesign – usage commercial
 </div>
 
 <script>
-const garmentPrices={
-  tshirt6:6,
-  tshirt8:8,
-  polo:12,
-  pull:14,
-  jacket:16,
-  flocseul:0
-};
+  const n = (id) => document.getElementById(id);
+  const num = (el) => { const v = parseFloat(el.value); return isNaN(v) ? 0 : v; };
+  const intv = (el) => { const v = parseInt(el.value,10); return isNaN(v) ? 0 : v; };
 
-const DTF_TEXTILE_CM2=0.025;
-const DTF_UV_CM2_CLIENT=0.05;
+  const garmentPrices = {
+    flocage: 0,
+    tshirt6: 6,
+    tshirt8: 8,
+    polo: 12,
+    pull: 14,
+    polaire: 16,
+    hoodiezip: 16
+  };
 
-function calc(){
-  const mode=document.getElementById("mode").value;
-  const qty=parseInt(document.getElementById("qty").value)||1;
-  let base=garmentPrices[document.getElementById("garment").value]||0;
-  let dtf=0,pose=0;
+  function discountRateFor(qty){
+    if (qty >= 101) return 0.30;
+    if (qty >= 81)  return 0.25;
+    if (qty >= 51)  return 0.20;
+    if (qty >= 41)  return 0.15;
+    if (qty >= 31)  return 0.10;
+    if (qty >= 21)  return 0.08;
+    if (qty >= 11)  return 0.05;
+    return 0;
+  }
 
-  if(mode==="textile"){
-    const sides=[
-      ["face","facePose"],
-      ["back","backPose"],
-      ["right","rightPose"],
-      ["left","leftPose"]
-    ];
-    sides.forEach(s=>{
-      let w=parseFloat(document.getElementById(s[0]+"W").value)||0;
-      let h=parseFloat(document.getElementById(s[0]+"H").value)||0;
-      if(w>0&&h>0) dtf+=w*h*DTF_TEXTILE_CM2;
-      if(document.getElementById(s[1]).checked && w>0 && h>0) pose+=5;
+  function calcSide(activeId, poseId, wId, hId, aId, cId, pricePerCm2){
+    const active = n(activeId).checked;
+    const area = active ? num(n(wId)) * num(n(hId)) : 0;
+    const dtfCost = area * pricePerCm2;
+    const poseCost = (active && n(poseId).checked) ? 5 : 0;
+
+    n(aId).value = area.toFixed(1);
+    n(cId).value = dtfCost.toFixed(2);
+
+    return { active, dtfCost, poseCost };
+  }
+
+  function setMode(){
+    const mode = n('mode').value;
+    n('textileBlock').style.display = mode === 'textile' ? '' : 'none';
+    n('uvBlock').style.display = mode === 'uv' ? '' : 'none';
+  }
+
+  function update(){
+    setMode();
+    const mode = n('mode').value;
+
+    let qty = 1;
+    let baseUnit = 0;
+
+    if(mode === 'textile'){
+      const garmentType = n('garmentType').value;
+      const garmentPrice = garmentPrices[garmentType] ?? 0;
+      n('garmentPrice').value = garmentPrice.toFixed(2);
+
+      qty = Math.max(1, intv(n('quantityTextile')));
+      n('quantityTextile').value = qty;
+
+      const pricePerCm2 = num(n('pricePerCm2Textile'));
+
+      const face  = calcSide('faceActive','facePose','faceW','faceH','faceA','faceC',pricePerCm2);
+      const back  = calcSide('backActive','backPose','backW','backH','backA','backC',pricePerCm2);
+      const right = calcSide('rightActive','rightPose','rightW','rightH','rightA','rightC',pricePerCm2);
+      const left  = calcSide('leftActive','leftPose','leftW','leftH','leftA','leftC',pricePerCm2);
+
+      const dtfTotal = face.dtfCost + back.dtfCost + right.dtfCost + left.dtfCost;
+      const poseTotal = face.poseCost + back.poseCost + right.poseCost + left.poseCost;
+
+      baseUnit = garmentPrice + dtfTotal + poseTotal;
+    }
+
+    if(mode === 'uv'){
+      const sheetArea = 24.5 * 35;
+      const supplierTotal = num(n('uvSheetPrice')) + num(n('uvShip'));
+      const supplierCm2 = supplierTotal / sheetArea;
+      const clientCm2 = supplierCm2 * (1 + num(n('uvMarkup'))/100);
+
+      let totalArea = 0;
+      let totalQty = 0;
+
+      for(let i=1;i<=6;i++){
+        const w = num(n(`u${i}w`));
+        const h = num(n(`u${i}h`));
+        const q = intv(n(`u${i}q`));
+        if(w && h && q){
+          totalArea += w*h*q;
+          totalQty += q;
+        }
+      }
+
+      qty = Math.max(1, totalQty);
+      baseUnit = totalQty ? (totalArea * clientCm2) / totalQty : 0;
+    }
+
+    const disc = discountRateFor(qty);
+    n('discountRate').textContent = (disc*100).toFixed(0) + " %";
+
+    const unit = baseUnit * (1 - disc);
+    const total = unit * qty;
+
+    n('pricePerPiece').textContent = unit.toFixed(2);
+    n('totalOrder').textContent = total.toFixed(2);
+    n('grandTotal').textContent = total.toFixed(2);
+  }
+
+  function resetAll(){
+    n('mode').value = 'textile';
+    n('garmentType').value = 'tshirt6';
+    n('quantityTextile').value = 1;
+    n('pricePerCm2Textile').value = 0.025;
+
+    ['face','back','right','left'].forEach(s=>{
+      n(`${s}Active`).checked = s==='face';
+      n(`${s}Pose`).checked = true;
     });
-  } else {
-    let w=parseFloat(document.getElementById("uvW").value)||0;
-    let h=parseFloat(document.getElementById("uvH").value)||0;
-    dtf=w*h*DTF_UV_CM2_CLIENT;
+
+    update();
   }
 
-  let unit=base+dtf+pose;
-  let total=unit*qty;
+  document.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('input', update);
+    el.addEventListener('change', update);
+  });
 
-  document.getElementById("unit").innerText=unit.toFixed(2);
-  document.getElementById("total").innerText=total.toFixed(2);
-  document.getElementById("grand").innerText=total.toFixed(2);
-}
-
-document.querySelectorAll("input,select").forEach(e=>{
-  e.addEventListener("input",calc);
-  e.addEventListener("change",calc);
-});
-
-document.getElementById("mode").addEventListener("change",()=>{
-  const uv=document.getElementById("uvSection");
-  const tx=document.getElementById("textileSides");
-  if(document.getElementById("mode").value==="uv"){
-    uv.style.display="block"; tx.style.display="none";
-  } else {
-    uv.style.display="none"; tx.style.display="block";
-  }
-  calc();
-});
-
-calc();
+  n('resetBtn').addEventListener('click', resetAll);
+  window.onload = resetAll;
 </script>
 </body>
 </html>
