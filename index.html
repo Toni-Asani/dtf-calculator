@@ -31,6 +31,7 @@
     th{text-align:left;color:#444}
     td input{width:100%}
     .chip{display:inline-block;background:#fff;border-radius:999px;padding:2px 8px;font-size:11px;color:#333}
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
@@ -44,6 +45,7 @@
         <label for="mode">Type</label>
         <select id="mode">
           <option value="textile" selected>DTF TEXTILE (vêtements)</option>
+          <option value="print_seul">DTF PRINT SEUL (impression seulement)</option>
           <option value="uv">DTF UV (stickers / objets) – impression seule</option>
         </select>
       </div>
@@ -84,7 +86,7 @@
         </div>
 
         <div class="field">
-          <label class="muted">Main-d’œuvre flocage</label>
+          <label class="muted">Main-d'œuvre flocage</label>
           <div class="muted"><span class="chip">5.–</span> par côté actif (Face/Dos/Épaules)</div>
         </div>
       </div>
@@ -132,33 +134,57 @@
     </div>
   </div>
 
+  <!-- DTF PRINT SEUL -->
+  <div id="printSeulBlock" style="display:none;">
+    <div class="section">
+      <div class="section-title">Paramètres DTF Print Seul</div>
+      <div class="row">
+        <div class="field">
+          <label for="printSeulPricePerCm2">Prix DTF / cm² (CHF)</label>
+          <input id="printSeulPricePerCm2" type="number" step="0.0001" value="0.025" />
+        </div>
+        <div class="field">
+          <label for="printSeulSetupFee">Frais de setup (CHF) – une fois par commande</label>
+          <input id="printSeulSetupFee" type="number" step="0.01" value="5" />
+        </div>
+        <div class="field muted">
+          Pour impression seulement, sans textile ni flocage
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Formes (plusieurs tailles)</div>
+      <div class="muted">Entre largeur/hauteur + quantité. Le calcul additionne les surfaces.</div>
+      <table>
+        <thead>
+          <tr><th>Largeur (cm)</th><th>Hauteur (cm)</th><th>Qté</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><input id="p1w" type="number" step="0.1" value="10"></td><td><input id="p1h" type="number" step="0.1" value="5"></td><td><input id="p1q" type="number" step="1" value="5"></td></tr>
+          <tr><td><input id="p2w" type="number" step="0.1" value="0"></td><td><input id="p2h" type="number" step="0.1" value="0"></td><td><input id="p2q" type="number" step="1" value="0"></td></tr>
+          <tr><td><input id="p3w" type="number" step="0.1" value="0"></td><td><input id="p3h" type="number" step="0.1" value="0"></td><td><input id="p3q" type="number" step="1" value="0"></td></tr>
+          <tr><td><input id="p4w" type="number" step="0.1" value="0"></td><td><input id="p4h" type="number" step="0.1" value="0"></td><td><input id="p4q" type="number" step="1" value="0"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- UV -->
   <div id="uvBlock" style="display:none;">
     <div class="section">
-      <div class="section-title">Paramètres DTF UV (impression seule)</div>
+      <div class="section-title">Paramètres DTF UV (stickers / objets)</div>
       <div class="row">
         <div class="field">
-          <label for="uvSheetPrice">Prix mini fournisseur (planche B4) CHF</label>
-          <input id="uvSheetPrice" type="number" step="0.01" value="14" />
+          <label for="uvClientCm2">Prix client / cm² (CHF)</label>
+          <input id="uvClientCm2" type="number" step="0.0001" value="0.05" />
         </div>
         <div class="field">
-          <label for="uvShip">Frais d’envoi (CHF) – sur la commande</label>
-          <input id="uvShip" type="number" step="0.01" value="0" />
-        </div>
-        <div class="field">
-          <label for="uvMarkup">Marge (%) sur coût fournisseur</label>
-          <input id="uvMarkup" type="number" step="0.1" value="200" />
-        </div>
-        <div class="field">
-          <label>Coût fournisseur / cm² (B4)</label>
-          <input id="uvSupplierCm2" type="number" readonly value="0.0000" />
-        </div>
-        <div class="field">
-          <label>Prix client / cm² (après marge)</label>
-          <input id="uvClientCm2" type="number" readonly value="0.0000" />
+          <label for="uvSetupFee">Frais de setup (CHF) – une fois par commande</label>
+          <input id="uvSetupFee" type="number" step="0.01" value="5" />
         </div>
         <div class="field muted">
-          B4 = 24.5×35 cm = <b>857.5 cm²</b> (minimum facturé fournisseur)
+          Minimum facturé: 1 planche B4 (24.5×35 cm = 857.5 cm²)
         </div>
       </div>
     </div>
@@ -175,8 +201,6 @@
           <tr><td><input id="u2w" type="number" step="0.1" value="0"></td><td><input id="u2h" type="number" step="0.1" value="0"></td><td><input id="u2q" type="number" step="1" value="0"></td></tr>
           <tr><td><input id="u3w" type="number" step="0.1" value="0"></td><td><input id="u3h" type="number" step="0.1" value="0"></td><td><input id="u3q" type="number" step="1" value="0"></td></tr>
           <tr><td><input id="u4w" type="number" step="0.1" value="0"></td><td><input id="u4h" type="number" step="0.1" value="0"></td><td><input id="u4q" type="number" step="1" value="0"></td></tr>
-          <tr><td><input id="u5w" type="number" step="0.1" value="0"></td><td><input id="u5h" type="number" step="0.1" value="0"></td><td><input id="u5q" type="number" step="1" value="0"></td></tr>
-          <tr><td><input id="u6w" type="number" step="0.1" value="0"></td><td><input id="u6h" type="number" step="0.1" value="0"></td><td><input id="u6q" type="number" step="1" value="0"></td></tr>
         </tbody>
       </table>
     </div>
@@ -194,7 +218,7 @@
     <div class="total-box"><span>Total (CHF)</span><span class="value" id="grandTotal">0.00</span></div>
 
     <button id="resetBtn">Réinitialiser</button>
-    <div class="note">Créé pour l’usage interne – Printedesign.</div>
+    <div class="note">Créé pour l'usage interne – Printedesign.</div>
   </div>
 
   <div class="footer">
@@ -248,29 +272,16 @@
     return {active, area, cost};
   }
 
-  // --- UV supplier & client price /cm2 from B4 minimum
-  function calcUvCm2Prices(){
-    const sheetArea = 24.5 * 35; // 857.5
-    const sheetPrice = num(n('uvSheetPrice'));
-    const ship = num(n('uvShip'));
-    const supplier = (sheetPrice + ship) / sheetArea;
-    const markupPct = num(n('uvMarkup')); // e.g. 200% => x3
-    const client = supplier * (1 + markupPct/100);
-    n('uvSupplierCm2').value = supplier.toFixed(4);
-    n('uvClientCm2').value = client.toFixed(4);
-    return {supplierCm2: supplier, clientCm2: client, sheetArea, sheetPrice, ship};
-  }
-
-  // --- UV total area from multiple shapes
-  function calcUvAreas(){
+  // --- Calculate total area from multiple shapes
+  function calcAreas(prefix, count){
     let totalArea = 0;
     let totalQty = 0;
-    for(let i=1;i<=6;i++){
-      const w = num(n(`u${i}w`));
-      const h = num(n(`u${i}h`));
-      const q = intv(n(`u${i}q`));
+    for(let i=1; i<=count; i++){
+      const w = num(n(`${prefix}${i}w`));
+      const h = num(n(`${prefix}${i}h`));
+      const q = intv(n(`${prefix}${i}q`));
       if(w>0 && h>0 && q>0){
-        totalArea += (w*h*q);
+        totalArea += (w * h * q);
         totalQty += q;
       }
     }
@@ -280,6 +291,7 @@
   function setMode(){
     const mode = n('mode').value;
     n('textileBlock').style.display = mode === 'textile' ? '' : 'none';
+    n('printSeulBlock').style.display = mode === 'print_seul' ? '' : 'none';
     n('uvBlock').style.display = mode === 'uv' ? '' : 'none';
   }
 
@@ -289,6 +301,8 @@
 
     let qty = 1;
     let baseUnit = 0;
+    let setupFee = 0;
+    let subtotal = 0;
 
     if(mode === 'textile'){
       const garmentType = n('garmentType').value;
@@ -310,41 +324,54 @@
       const dtfCost = face.cost + back.cost + right.cost + left.cost;
 
       baseUnit = garmentPrice + timeCost + dtfCost;
+      subtotal = baseUnit * qty;
+    }
+
+    if(mode === 'print_seul'){
+      const pricePerCm2 = num(n('printSeulPricePerCm2'));
+      setupFee = num(n('printSeulSetupFee'));
+      
+      const {totalArea, totalQty} = calcAreas('p', 4);
+      
+      qty = Math.max(1, totalQty || 1);
+      
+      const totalCost = (totalArea * pricePerCm2) + setupFee;
+      baseUnit = totalCost / qty;
+      subtotal = totalCost;
     }
 
     if(mode === 'uv'){
-      const {clientCm2, sheetArea, sheetPrice, ship} = calcUvCm2Prices();
-      const {totalArea, totalQty} = calcUvAreas();
-
-      // quantity for discount = total number of stickers (sum of qty)
+      const pricePerCm2 = num(n('uvClientCm2'));
+      setupFee = num(n('uvSetupFee'));
+      
+      const {totalArea, totalQty} = calcAreas('u', 4);
+      
       qty = Math.max(1, totalQty || 1);
-
-      // IMPORTANT: minimum supplier is 1 sheet B4.
-      // For client unit price, we compute per sticker (unit) as: (totalArea * clientCm2)/totalQty
-      // If totalArea is 0, keep 0.
-      const totalPrice = totalArea > 0 ? (totalArea * clientCm2) : 0;
-
-      baseUnit = (totalQty > 0) ? (totalPrice / totalQty) : 0;
-
-      // If you want to enforce a MINIMUM billed equal to 1 B4 to the client,
-      // uncomment the next line:
-      // baseUnit = Math.max(baseUnit, (sheetArea * clientCm2) / Math.max(1,totalQty));
+      
+      // Minimum: 1 planche B4 (857.5 cm²)
+      const MIN_AREA = 857.5;
+      const billedArea = Math.max(totalArea, MIN_AREA);
+      
+      const totalCost = (billedArea * pricePerCm2) + setupFee;
+      baseUnit = totalCost / qty;
+      subtotal = totalCost;
     }
 
     const disc = discountRateFor(qty);
     n('discountRate').textContent = (disc*100).toFixed(0) + " %";
 
-    const unitWithDisc = baseUnit * (1 - disc);
-    const total = unitWithDisc * qty;
+    const discountAmount = subtotal * disc;
+    const total = subtotal - discountAmount;
 
-    n('pricePerPiece').textContent = unitWithDisc.toFixed(2);
-    n('totalOrder').textContent = total.toFixed(2);
+    n('pricePerPiece').textContent = baseUnit.toFixed(2);
+    n('totalOrder').textContent = (subtotal - discountAmount).toFixed(2);
     n('grandTotal').textContent = total.toFixed(2);
   }
 
   function resetAll(){
     n('mode').value = 'textile';
 
+    // Reset textile
     n('garmentType').value = 'tshirt6';
     n('quantityTextile').value = 1;
     n('pricePerCm2Textile').value = 0.025;
@@ -354,33 +381,46 @@
     n('rightActive').checked = false; n('rightW').value = 8; n('rightH').value = 3;
     n('leftActive').checked = false; n('leftW').value = 8; n('leftH').value = 3;
 
-    n('uvSheetPrice').value = 14;
-    n('uvShip').value = 0;
-    n('uvMarkup').value = 200;
+    // Reset print seul
+    n('printSeulPricePerCm2').value = 0.025;
+    n('printSeulSetupFee').value = 5;
+    n('p1w').value = 10; n('p1h').value = 5; n('p1q').value = 5;
+    for(let i=2;i<=4;i++){ n(`p${i}w`).value=0; n(`p${i}h`).value=0; n(`p${i}q`).value=0; }
 
-    // default example: 10x5cm x 5
+    // Reset UV
+    n('uvClientCm2').value = 0.05;
+    n('uvSetupFee').value = 5;
     n('u1w').value = 10; n('u1h').value = 5; n('u1q').value = 5;
-    for(let i=2;i<=6;i++){ n(`u${i}w`).value=0; n(`u${i}h`).value=0; n(`u${i}q`).value=0; }
+    for(let i=2;i<=4;i++){ n(`u${i}w`).value=0; n(`u${i}h`).value=0; n(`u${i}q`).value=0; }
 
     update();
   }
 
   // listeners
-  [
+  const allInputs = [
     'mode','garmentType','quantityTextile','pricePerCm2Textile',
     'faceActive','faceW','faceH','backActive','backW','backH',
     'rightActive','rightW','rightH','leftActive','leftW','leftH',
-    'uvSheetPrice','uvShip','uvMarkup',
-    'u1w','u1h','u1q','u2w','u2h','u2q','u3w','u3h','u3q','u4w','u4h','u4q','u5w','u5h','u5q','u6w','u6h','u6q'
-  ].forEach(id=>{
+    'printSeulPricePerCm2','printSeulSetupFee',
+    'p1w','p1h','p1q','p2w','p2h','p2q','p3w','p3h','p3q','p4w','p4h','p4q',
+    'uvClientCm2','uvSetupFee',
+    'u1w','u1h','u1q','u2w','u2h','u2q','u3w','u3h','u3q','u4w','u4h','u4q'
+  ];
+
+  allInputs.forEach(id=>{
     const el = n(id);
-    el.addEventListener('input', update);
-    el.addEventListener('change', update);
+    if(el){
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+    }
   });
 
   n('resetBtn').addEventListener('click', resetAll);
 
-  window.onload = resetAll;
+  // Initialisation
+  window.onload = function() {
+    resetAll();
+  };
 </script>
 </body>
 </html>
